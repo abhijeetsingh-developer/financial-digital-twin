@@ -69,7 +69,7 @@ async function simulate() {
   resultBox.innerHTML = "Calculating...";
 
   try {
-    const response = await fetch("https://financial-digital-twin-kvfj.onrender.com/simulate", {
+    const response = await fetch("https://financial-digital-twin-2.onrender.com/simulate",{
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload)
