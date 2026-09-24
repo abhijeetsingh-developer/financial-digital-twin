@@ -1,10 +1,18 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Literal
 
 app = FastAPI(title="Financial Digital Twin API")
 
-
+# Add CORS middleware to allow your Vercel frontend to connect
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all websites to connect
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class FinancialInput(BaseModel):
     income: float = Field(gt=0)
     expenses: float = Field(ge=0)
