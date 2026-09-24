@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Financial Digital Twin MVP</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
+    input, select, button { padding: 10px; margin: 6px 0; width: 100%; box-sizing: border-box; }
+    button { cursor: pointer; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 18px; margin-top: 20px; }
+    .metric { font-size: 28px; font-weight: bold; }
+    @media(max-width: 650px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <h1>Financial Digital Twin</h1>
+  <p>Simulate tomorrow's financial decisions before making them today.</p>
+
+  <div class="grid">
+    <label>Monthly income
+      <input id="income" type="number" value="40000">
+    </label>
+
+    <label>Monthly expenses
+      <input id="expenses" type="number" value="25000">
+    </label>
+
+    <label>Current savings
+      <input id="savings" type="number" value="80000">
+    </label>
+
+    <label>Purchase amount
+      <input id="purchase" type="number" value="60000">
+    </label>
+
+    <label>EMI amount
+      <input id="emi" type="number" value="5500">
+    </label>
+
+    <label>Scenario
+      <select id="scenario">
+        <option value="baseline">Baseline</option>
+        <option value="cash">Buy with cash</option>
+        <option value="emi">Buy with EMI</option>
+        <option value="delay">Delay purchase 3 months</option>
+        <option value="income_drop">Income drops 15%</option>
+        <option value="expense_rise">Expenses rise 10%</option>
+      </select>
+    </label>
+  </div>
+
+  <button onclick="simulate()">Simulate Decision</button>
+
+  <div class="card" id="result">Enter your numbers and run a simulation.</div>
+
+<script>
+async function simulate() {
+  const payload = {
+    income: Number(document.getElementById("income").value),
+    expenses: Number(document.getElementById("expenses").value),
+    savings: Number(document.getElementById("savings").value),
+    purchase: Number(document.getElementById("purchase").value),
+    emi: Number(document.getElementById("emi").value),
+    scenario: document.getElementById("scenario").value
+  };
+
+  const resultBox = document.getElementById("result");
+  resultBox.innerHTML = "Calculating...";
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/simulate", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    resultBox.innerHTML = `
+      <h2>Simulation Result</h2>
+      <p>Scenario: <b>${data.scenario}</b></p>
+      <p>Monthly buffer</p>
+      <div class="metric">₹${data.monthly_buffer.toLocaleString()}</div>
+      <p>Cash runway</p>
+      <div class="metric">${data.runway_months} months</div>
+      <p>Financial stress score</p>
+      <div class="metric">${data.stress_score}/100</div>
+      <p>Risk level: <b>${data.risk_level}</b></p>
+      <p>Savings after scenario: ₹${data.savings.toLocaleString()}</p>
+    `;
+  } catch (error) {
+    resultBox.innerHTML =
+      "<b>Could not connect to backend.</b><br>Start FastAPI using the README instructions.";
+  }
+}
+</script>
+</body>
+</html>
